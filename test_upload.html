@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Audio Upload</title>
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+</head>
+<body>
+    <div x-data="{
+        selectedFile: null,
+        isUploading: false,
+        result: '',
+        
+        handleFileSelection(event) {
+            this.selectedFile = event.target.files[0];
+            console.log('File selected:', this.selectedFile);
+        },
+        
+        async uploadFile() {
+            if (!this.selectedFile) {
+                alert('Please select a file first');
+                return;
+            }
+            
+            this.isUploading = true;
+            this.result = '';
+            
+            const formData = new FormData();
+            formData.append('audio_file', this.selectedFile);
+            formData.append('language', 'auto');
+            formData.append('include_timestamps', 'true');
+            formData.append('speaker_identification', 'false');
+            formData.append('model', 'base');
+            
+            try {
+                console.log('Sending request...');
+                const response = await fetch('/transcribe-audio', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                console.log('Response status:', response.status);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('Success:', data);
+                    this.result = data.transcription || 'No transcription returned';
+                } else {
+                    const errorText = await response.text();
+                    console.error('Error:', errorText);
+                    this.result = 'Error: ' + errorText;
+                }
+            } catch (error) {
+                console.error('Request failed:', error);
+                this.result = 'Request failed: ' + error.message;
+            } finally {
+                this.isUploading = false;
+            }
+        }
+    }">
+        <h1>Test Audio Upload</h1>
+        
+        <div style="margin: 20px 0;">
+            <input type="file" accept="audio/*" @change="handleFileSelection($event)">
+        </div>
+        
+        <div style="margin: 20px 0;">
+            <button @click="uploadFile()" :disabled="!selectedFile || isUploading" 
+                    style="padding: 10px 20px; background: blue; color: white;">
+                <span x-text="isUploading ? 'Uploading...' : 'Upload & Transcribe'"></span>
+            </button>
+        </div>
+        
+        <div x-show="selectedFile" style="margin: 20px 0;">
+            <strong>Selected file:</strong> <span x-text="selectedFile ? selectedFile.name : ''"></span>
+        </div>
+        
+        <div x-show="result" style="margin: 20px 0; padding: 10px; border: 1px solid #ccc;">
+            <strong>Result:</strong>
+            <pre x-text="result" style="white-space: pre-wrap;"></pre>
+        </div>
+    </div>
+</body>
+</html>

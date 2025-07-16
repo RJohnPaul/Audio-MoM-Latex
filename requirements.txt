@@ -7,3 +7,6 @@ pandas
 setuptools>=65
 nltk
 pyannote.audio
+flask 
+groq
+numpy

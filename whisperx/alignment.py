@@ -11,7 +11,8 @@ import numpy as np
 import pandas as pd
 import torch
 import torchaudio
-from transformers import Wav2Vec2ForCTC, Wav2Vec2Processor
+# Lazy imports to avoid TensorFlow DLL issues
+# from transformers import Wav2Vec2ForCTC, Wav2Vec2Processor
 
 from .audio import SAMPLE_RATE, load_audio
 from .utils import interpolate_nans
@@ -94,6 +95,8 @@ def load_align_model(language_code: str, device: str, model_name: Optional[str] 
         align_dictionary = {c.lower(): i for i, c in enumerate(labels)}
     else:
         try:
+            # Lazy import to avoid TensorFlow DLL issues when not using alignment
+            from transformers import Wav2Vec2ForCTC, Wav2Vec2Processor
             processor = Wav2Vec2Processor.from_pretrained(model_name, cache_dir=model_dir)
             align_model = Wav2Vec2ForCTC.from_pretrained(model_name, cache_dir=model_dir)
         except Exception as e:

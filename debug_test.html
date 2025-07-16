@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Audio Transcription Debug Test</title>
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+</head>
+<body>
+    <div x-data="{
+        transcriptionResult: '',
+        selectedAudioFile: null,
+        isTranscribing: false,
+        
+        async testUpload() {
+            console.log('Test upload started');
+            this.isTranscribing = true;
+            
+            const formData = new FormData();
+            formData.append('audio_file', this.selectedAudioFile);
+            formData.append('language', 'auto');
+            formData.append('include_timestamps', 'true');
+            formData.append('speaker_identification', 'false');
+            formData.append('model', 'base');
+            
+            try {
+                const response = await fetch('/transcribe-audio', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                console.log('Response status:', response.status);
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    console.log('Result:', result);
+                    this.transcriptionResult = result.transcription;
+                    console.log('transcriptionResult set to:', this.transcriptionResult);
+                } else {
+                    console.error('Response not ok:', response.status);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            } finally {
+                this.isTranscribing = false;
+            }
+        },
+        
+        handleFileSelect(event) {
+            this.selectedAudioFile = event.target.files[0];
+            console.log('File selected:', this.selectedAudioFile?.name);
+        }
+    }">
+        <h1>Debug Test</h1>
+        
+        <input type="file" @change="handleFileSelect($event)" accept="audio/*">
+        
+        <button @click="testUpload()" :disabled="!selectedAudioFile || isTranscribing">
+            <span x-text="isTranscribing ? 'Uploading...' : 'Upload & Transcribe'"></span>
+        </button>
+        
+        <div x-show="transcriptionResult" style="margin-top: 20px; padding: 10px; border: 1px solid #ccc;">
+            <h3>Transcription Result:</h3>
+            <pre x-text="transcriptionResult"></pre>
+        </div>
+        
+        <div x-show="!transcriptionResult && !isTranscribing" style="margin-top: 20px; color: #666;">
+            No transcription result yet.
+        </div>
+    </div>
+</body>
+</html>

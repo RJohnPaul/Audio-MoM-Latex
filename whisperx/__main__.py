@@ -20,6 +20,9 @@ def cli():
     parser.add_argument("--audio_dir", default=DEFAULT_AUDIO_DIR, help="Directory to scan for audio files")
     parser.add_argument("--hf_token", default=os.getenv("HF_TOKEN"), help="HuggingFace token (optional if set in env)")
     parser.add_argument("--model", default="large-v2", help="Model size (tiny, base, small, medium, large-v1, large-v2)")
+    parser.add_argument("--device", default="cpu", help="device to use for PyTorch inference")
+    parser.add_argument("--compute_type", default="float32", type=str, choices=["float16", "float32", "int8"], help="compute type for computation")
+    parser.add_argument("--language", type=str, default="en", help="language spoken in the audio")
     
     args = parser.parse_args()
     
@@ -29,13 +32,15 @@ def cli():
     
     transcriber = WhisperXTranscriber(
         model_name=args.model,
+        device=args.device,
+        compute_type=args.compute_type,
         hf_token=args.hf_token
     )
     
     for audio_path in audio_files:
         transcriber.transcribe(
             audio_path=audio_path,
-            language="en",
+            language=args.language,
             diarize=True if args.hf_token else False
         )
     

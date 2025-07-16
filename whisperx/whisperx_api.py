@@ -84,13 +84,18 @@ class WhisperXTranscriber:
             "initial_prompt": None,
             "suppress_tokens": [-1],
             "suppress_numerals": False
-        }
-
-        # Load required modules
+        }        # Load required modules
         from .asr import load_model
         from .audio import load_audio
         from .alignment import align, load_align_model
-        from .diarize import DiarizationPipeline, assign_word_speakers
+        try:
+            from .diarize import DiarizationPipeline, assign_word_speakers
+        except ImportError:
+            DiarizationPipeline = None
+            assign_word_speakers = None
+            if diarize:
+                print("Warning: Diarization is not available due to TensorFlow/transformers import issues.")
+                diarize = False
         from .utils import get_writer
 
         # Load ASR model
