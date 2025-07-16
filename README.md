@@ -185,5 +185,5 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 ---
 
 <p align="center">
-  <i>Created with ❤️ by <a href="https://github.com/RJohnPaul">RJohnPaul</a>,Sai Ganesh and Shubam for the backend</i>
+  <i>Frontend Created with ❤️ by <a href="https://github.com/RJohnPaul">RJohnPaul</a> , Backend by Sai Ganesh and Shubam </i>
 </p>
