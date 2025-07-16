@@ -39,7 +39,9 @@ import faster_whisper
 app = Flask(__name__)
 app.config['MAX_CONTENT_LENGTH'] = 100 * 1024 * 1024  # 100MB max file size
 
-client = Groq(api_key="KEY_PLACEHOLDER")  # Replace with your actual Groq API key
+# Load API key from environment variable
+import os
+client = Groq(api_key=os.environ.get("GROQ_API_KEY", ""))  # Get API key from environment variable
 
 def remove_think_tags(text):
     return re.sub(r'<think>.*?</think>', '', text, flags=re.DOTALL).strip()
