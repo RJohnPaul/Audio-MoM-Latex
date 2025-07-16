@@ -10,4 +10,3 @@ pyannote.audio
 flask 
 groq
 numpy
-python-dotenv
